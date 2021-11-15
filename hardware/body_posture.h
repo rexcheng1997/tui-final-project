@@ -5,7 +5,7 @@
 
 class BodyPosture {
   public:
-    BodyPosture() {};
+    BodyPosture();
 
     // update the states of strips from the readings
     void update_readings(const reading_t* readings);
@@ -15,7 +15,7 @@ class BodyPosture {
 
   private:
     strip_state_t strips[NUM_STRIPS];
-    static const reading_t threshold = 100; // threshold to determine if there is a significant difference between two consecutive readings
+    static const reading_t threshold_ratio = 50; // threshold to determine if there is a significant difference between two consecutive readings
 };
 
 #endif
