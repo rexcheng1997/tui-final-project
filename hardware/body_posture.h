@@ -13,9 +13,16 @@ class BodyPosture {
     // get the current body posture inferred from strip states
     const Posture get_body_posture() const;
 
+    // functions for debugging
+    void print_reading_changes() const;
+    void print_strip_states() const;
+
   private:
     strip_state_t strips[NUM_STRIPS];
-    static const reading_t threshold_ratio = 50; // threshold to determine if there is a significant difference between two consecutive readings
+    uint8_t prev_state_mask, curr_state_mask;
+    static const reading_t threshold = 30; // threshold to determine if there is a significant difference between two consecutive readings
 };
+
+const uint8_t count_one_bits(const uint8_t mask);
 
 #endif

@@ -3,13 +3,13 @@
 
 #include <Arduino.h>
 
-#define NUM_STRIPS 1 // four aluminium foil strips in total
+#define NUM_STRIPS 4 // four aluminium foil strips in total
 
 // type of readings from the sensors
 typedef long reading_t;
 
 // enum type for body postures
-enum Posture { off, lying, sitting, standing, walking };
+enum Posture { OFF, STANDING, WALKING, SITTING, LYING };
 
 // struct to record the state of a strip
 // use prev and curr readings to determine if a strip is triggered
