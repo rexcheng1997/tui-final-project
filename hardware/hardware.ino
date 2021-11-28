@@ -38,12 +38,14 @@ void loop() {
   posture.update_readings(cap_vals);
   
   // use the line below to print/plot the difference between two consecutive readings
-  posture.print_reading_changes();
+//  posture.print_reading_changes();
   // use the line below to print/plot the state changes for the aluminum foil strips
 //  posture.print_strip_states();
+//  Serial.println(posture.get_body_posture());
 
   Message msg;
   msg.add_pair("bodyPosture", posture.get_body_posture());
+  Serial.println(msg.to_json());
 
-  delay(100);
+  delay(800);
 }

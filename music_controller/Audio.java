@@ -19,6 +19,10 @@ public class Audio {
     this.fadeOut = false;
   }
   
+  public float getVolume() {
+    return this.volume;
+  }
+  
   public void fadeIn() {
     this.fadeIn = true;
     this.fadeOut = false;

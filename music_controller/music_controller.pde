@@ -17,6 +17,7 @@ final String audioFiles[] = new String[] {
 };
 
 HashMap<String, Audio> tracks = new HashMap<String, Audio>(2 * audioFiles.length);
+String drumTrackId = null;
 
 /*** Mats ***/
 Mat mat1, mat2;
@@ -25,24 +26,24 @@ void setup() {
   // Serial setup
   printArray(Serial.list());
   /* CAUTION: which port to use depends on port connection! */
-  //port1 = new Serial(this, "/dev/tty.usbmodem14401", 9600);
-  //port2 = new Serial(this, "/dev/tty.usbmodem14401", 9600);
-  //port1.bufferUntil(LF);
-  //port2.bufferUntil(LF);
+  port1 = new Serial(this, "/dev/tty.usbmodem14101", 9600);
+  port2 = new Serial(this, "/dev/tty.usbmodem14401", 9600);
+  port1.bufferUntil(LF);
+  port2.bufferUntil(LF);
   
   // Mat setup
   mat1 = new Mat(port1, new String[][] {
     {}, // OFF
-    { "piano1-standing", "violin1-standing", "drum-standing" }, // STANDING
-    { "piano1-walking", "violin1-walking", "drum-walking" }, // WALKING
-    { "piano1-sitting", "drum-sitting" }, // SITTING
+    { "piano1-standing", "violin1-standing" }, // STANDING
+    { "piano1-walking", "violin1-walking" }, // WALKING
+    { "piano1-sitting" }, // SITTING
     { "piano1-lying" }, // LYING
   });
   mat2 = new Mat(port2, new String[][] {
     {}, // OFF
-    { "piano2-standing", "violin2-standing", "drum-standing" }, // STANDING
-    { "piano2-walking", "violin2-walking", "drum-walking" }, // WALKING
-    { "piano2-sitting", "drum-sitting" }, // SITTING
+    { "piano2-standing", "violin2-standing" }, // STANDING
+    { "piano2-walking", "violin2-walking" }, // WALKING
+    { "piano2-sitting" }, // SITTING
     { "piano2-lying" }, // LYING
   });
   
@@ -63,7 +64,7 @@ void draw() {
   for (Audio audio : tracks.values()) {
     audio.update();
   }
-  delay(400);
+  delay(200);
 }
 
 void keyPressed() {
@@ -105,8 +106,13 @@ void serialEvent(Serial p) {
     
     Mat current = null;
     
-    if (p == mat1.getPort()) current = mat1;
-    else if (p == mat2.getPort()) current = mat2;
+    if (p == mat1.getPort()) {
+      current = mat1;
+      println("Mat 1: " + bodyPosture);
+    } else if (p == mat2.getPort()) {
+      current = mat2;
+      println("Mat 2: " + bodyPosture);
+    }
     
     if (current == null) return;
     
@@ -114,17 +120,38 @@ void serialEvent(Serial p) {
     final String[] prevPlaying = current.getPlaying();
     if (current.update(bodyPosture)) {
       for (String trackId : prevPlaying) tracks.get(trackId).fadeOut();
-      final String[] toPlay = mat1.getPlaying();
+      final String[] toPlay = current.getPlaying();
       for (String trackId : toPlay) tracks.get(trackId).fadeIn();
     }
     
+    // the drum track is played based on states of both mats
+    playDrumTrack();
+    
+    // trumpet bonus track when both mats are in the WALKING state
     if (mat1.getState() == 2 && mat2.getState() == 2) {
-      tracks.get("trumpet").fadeIn();
+      if (tracks.get("trumpet").getVolume() < 1)
+        tracks.get("trumpet").fadeIn();
     } else {
-      tracks.get("trumpet").fadeOut();
+      if (tracks.get("trumpet").getVolume() > 0)
+        tracks.get("trumpet").fadeOut();
     }
       
   } catch (RuntimeException err) {
     err.printStackTrace();
   }
+}
+
+void playDrumTrack() {
+  String trackId = null;
+  
+  if (mat1.getState() == 1 || mat2.getState() == 1) trackId = "drum-standing";
+  else if (mat1.getState() == 3 || mat2.getState() == 3) trackId = "drum-sitting";
+  
+  if (trackId == drumTrackId) return;
+  
+  if (drumTrackId != null) tracks.get(drumTrackId).fadeOut();
+  
+  if (trackId != null) tracks.get(trackId).fadeIn();
+  
+  drumTrackId = trackId;
 }
