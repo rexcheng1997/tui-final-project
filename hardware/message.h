@@ -1,12 +1,12 @@
-#ifndef PACKAGE_H
-#define PACKAGE_H
+#ifndef MESSAGE_H
+#define MESSAGE_H
 
-#include <ArxContainer.h>
 #include "custom_types.h"
+#include <ArxContainer.h>
 
-class Package {
+class Message {
   public:
-    Package() {};
+    Message() {};
 
     // add a key-value pair to Package
     void add_pair(const String key, const reading_t val);

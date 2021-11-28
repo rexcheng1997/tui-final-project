@@ -44,8 +44,8 @@ const Posture BodyPosture::get_body_posture() const {
   if (mask_xor == 0) { // touches remain the same
     return one_bits_in_curr == 1 ? Posture::STANDING : Posture::SITTING;
   } else { // touches change
-    if (one_bits_in_curr < 3) return Posture::WALKING;
-    return Posture::SITTING;
+    if (one_bits_in_curr == 3) return Posture::SITTING;
+    return Posture::WALKING;
   }
 }
 

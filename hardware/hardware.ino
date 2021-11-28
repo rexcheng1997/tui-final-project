@@ -1,6 +1,6 @@
 #include <CapacitiveSensor.h>
 #include "custom_types.h"
-#include "package.h"
+#include "message.h"
 #include "body_posture.h"
 
 #define FSR1_PIN 0
@@ -41,6 +41,9 @@ void loop() {
   posture.print_reading_changes();
   // use the line below to print/plot the state changes for the aluminum foil strips
 //  posture.print_strip_states();
+
+  Message msg;
+  msg.add_pair("bodyPosture", posture.get_body_posture());
 
   delay(100);
 }

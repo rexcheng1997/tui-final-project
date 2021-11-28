@@ -1,10 +1,10 @@
-#include "package.h"
+#include "message.h"
 
-void Package::add_pair(const String key, const reading_t val) {
+void Message::add_pair(const String key, const reading_t val) {
   this->pairs.insert(key, val);
 }
 
-const String Package::to_json() const {
+const String Message::to_json() const {
   String result = "{";
   for (const auto& pair : this->pairs) {
     result += "\"" + pair.first + "\"";
