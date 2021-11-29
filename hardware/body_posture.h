@@ -20,7 +20,7 @@ class BodyPosture {
   private:
     strip_state_t strips[NUM_STRIPS];
     uint8_t prev_state_mask, curr_state_mask;
-    static const reading_t threshold = 100; // threshold to determine if there is a significant difference between two consecutive readings
+    static const reading_t threshold = 300; // threshold to determine if there is a significant difference between two consecutive readings
 };
 
 const uint8_t count_one_bits(const uint8_t mask);
