@@ -4,11 +4,13 @@ import processing.serial.*;
 /* Body posture mapping from Arduino */
 // 0 - OFF, 1 - STANDING, 2 - WALKING, 3 - SITTING, 4 - LYING
 public class Mat {
+  boolean enabled;
   private Serial port;
   private int state; // enum mapping for body posture
   private String[][] m; // mapping from body posture to track ids
   
   public Mat(Serial p, String[][] trackIds) {
+    this.enabled = true;
     this.port = p;
     this.state = 0;
     this.m = trackIds;

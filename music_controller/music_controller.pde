@@ -18,9 +18,11 @@ final String audioFiles[] = new String[] {
 
 HashMap<String, Audio> tracks = new HashMap<String, Audio>(2 * audioFiles.length);
 String drumTrackId = null;
+boolean disableSerial = false;
 
 /*** Mats ***/
 Mat mat1, mat2;
+final String postures[] = new String[] { "OFF", "STANDING", "WALKING", "SITTING", "LYING" };
 
 void setup() {
   // Serial setup
@@ -85,13 +87,27 @@ void keyPressed() {
     case 'x': tracks.get("drum-standing").toggle(); break;
     case 'c': tracks.get("drum-walking").toggle(); break;
     case 'm': tracks.get("trumpet").toggle(); break;
-    case '0': for (Audio audio : tracks.values()) audio.fadeOut();
+    case '1':
+      if (mat1.enabled) println("*** Disable Mat 1 ***");
+      else println("*** Enable Mat 1 ***");
+      mat1.enabled = !mat1.enabled;
+      break;
+    case '2':
+      if (mat2.enabled) println("*** Disable Mat 2 ***");
+      else println("*** Enable Mat 2 ***");
+      mat2.enabled = !mat2.enabled;
+      break;
+    case '0':
+      for (Audio audio : tracks.values()) audio.fadeOut();
+      if (!disableSerial) println("*** Disable Serial events ***");
+      else println("*** Enable Serial events ***");
+      disableSerial = !disableSerial;
   }
 }
 
 void serialEvent(Serial p) {
   try {
-    if (p.available() <= 0) return;
+    if (disableSerial || p.available() <= 0) return;
     
     // process incoming message from Serial
     final String inMsg = p.readString();
@@ -106,12 +122,12 @@ void serialEvent(Serial p) {
     
     Mat current = null;
     
-    if (p == mat1.getPort()) {
+    if (p == mat1.getPort() && mat1.enabled) {
       current = mat1;
-      println("Mat 1: " + bodyPosture);
-    } else if (p == mat2.getPort()) {
+      println("Mat 1: " + postures[bodyPosture]);
+    } else if (p == mat2.getPort() && mat2.enabled) {
       current = mat2;
-      println("Mat 2: " + bodyPosture);
+      println("Mat 2: " + postures[bodyPosture]);
     }
     
     if (current == null) return;
@@ -127,7 +143,7 @@ void serialEvent(Serial p) {
     // the drum track is played based on states of both mats
     playDrumTrack();
     
-    // trumpet bonus track when both mats are in the WALKING state
+    // bonus trumpet track when both mats are in the WALKING state
     if (mat1.getState() == 2 && mat2.getState() == 2) {
       if (tracks.get("trumpet").getVolume() < 1)
         tracks.get("trumpet").fadeIn();
@@ -145,7 +161,8 @@ void playDrumTrack() {
   String trackId = null;
   
   if (mat1.getState() == 1 || mat2.getState() == 1) trackId = "drum-standing";
-  else if (mat1.getState() == 3 || mat2.getState() == 3) trackId = "drum-sitting";
+  else if (mat1.getState() == 2 || mat2.getState() == 2) trackId = "drum-walking";
+  //else if (mat1.getState() == 3 || mat2.getState() == 3) trackId = "drum-sitting";
   
   if (trackId == drumTrackId) return;
   
